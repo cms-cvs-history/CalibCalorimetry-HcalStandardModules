@@ -1,11 +1,11 @@
-#ifndef HcalPedestalAnalysis_H
-#define HcalPedestalAnalysis_H
+#ifndef HcalPedestalAnalyzer_H
+#define HcalPedestalAnalyzer_H
 
 /*
- * \file HcalPedestalAnalysis.h
+ * \file HcalPedestalAnalyzer.h
  *
- * $Date: 2005/11/30 22:05:56 $
- * $Revision: 1.4 $
+ * $Date: 2006/01/05 19:55:32 $
+ * $Revision: 1.1 $
  * \author W. Fisher
  *
 */
@@ -19,6 +19,8 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 
 #include "CalibCalorimetry/HcalAlgos/interface/HcalDbASCIIIO.h"
+#include "CalibCalorimetry/HcalAlgos/interface/HcalPedestalAnalysis.h"
+
 #include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
 #include "CalibFormats/HcalObjects/interface/HcalCoderDb.h"
 #include "CalibFormats/HcalObjects/interface/HcalCalibrations.h"
@@ -27,7 +29,7 @@
 #include "CondFormats/HcalObjects/interface/HcalQIECoder.h"
 #include "CondFormats/HcalObjects/interface/HcalPedestals.h"
 #include "CondFormats/HcalObjects/interface/HcalPedestalWidths.h"
-#include "TH1F.h"
+
 
 #include <memory>
 #include <iostream>
@@ -37,15 +39,15 @@
 
 using namespace std;
 
-class HcalPedestalAnalysis: public edm::EDAnalyzer{
+class HcalPedestalAnalyzer: public edm::EDAnalyzer{
 
 public:
 
 /// Constructor
-HcalPedestalAnalysis(const edm::ParameterSet& ps);
+HcalPedestalAnalyzer(const edm::ParameterSet& ps);
 
 /// Destructor
-~HcalPedestalAnalysis();
+~HcalPedestalAnalyzer();
 
 protected:
 
@@ -59,34 +61,16 @@ void beginJob(const edm::EventSetup& c);
 void endJob(void);
 
 private:
- void processEvent(const HBHEDigiCollection& hbhe,
-		   const HODigiCollection& ho,
-		   const HFDigiCollection& hf,
-		   const HcalDbService& cond);
- 
- void perChanHists(int id, const HcalDetId detid, const HcalQIESample& qie, map<HcalDetId, map<int, TH1F*> > &tool);
  
   int m_ievt;
   string m_outputFileROOT;
   string m_outputFileMean;
   string m_outputFileWidth;
   ofstream m_logFile;
+  HcalPedestalAnalysis* m_pedAnal;
 
   int m_startSample;
   int m_endSample;
-
-  const HcalQIEShape* m_shape;
-  const HcalQIECoder* m_coder;
-  
-  struct{
-    map<HcalDetId,map<int, TH1F*> > PEDVALS;
-    TH1F* ALLPEDS;
-    TH1F* PEDRMS;
-    TH1F* PEDMEAN;
-    TH1F* CAPIDRMS;
-    TH1F* CAPIDMEAN;
-  } hbHists, hfHists, hoHists;
-  map<HcalDetId, map<int,TH1F*> >::iterator _meo;
 
 };
 
