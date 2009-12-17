@@ -1,5 +1,5 @@
-#ifndef HcalPedestalMCWidths_H
-#define HcalPedestalMCWidths_H
+#ifndef HcalPedestalWidthsValidation_H
+#define HcalPedestalWidthsValidation_H
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -32,16 +32,12 @@
 #include "CondTools/Hcal/interface/HcalDbOnline.h"
 
 #include "CalibCalorimetry/HcalAlgos/interface/HcalDbASCIIIO.h"
-#include "CalibCalorimetry/HcalStandardModules/interface/HcalCondXML.h"
 #include "TBDataFormats/HcalTBObjects/interface/HcalTBTriggerData.h"
 
 #include "TFile.h"
 #include "TProfile.h"
 #include "TH1.h"
 #include "TH2.h"
-#include "TCanvas.h"
-#include "TStyle.h"
-
 #include <math.h>
 #include <iostream>
 #include <map>
@@ -56,42 +52,59 @@ namespace edm {
   class EventSetup;
 }
 
-   struct MCWidthsBunch
+   struct NewPedBunchVal
    {
       HcalDetId detid;
       bool usedflag;
-      float sig[4][10][10];
-      float prod[4][10][10];
-      int num[4][10][10];
+      float cap[4];
+      float capfc[4];
+      float sig[4][4];
+      float sigfc[4][4];
+      float prod[4][4];
+      float prodfc[4][4];
+      int num[4][4];
+      TH1F * hist[4];
+      TH2F * covarhistADC;
+      TH2F * covarhistfC;
    };
 
-class HcalPedestalMCWidths : public edm::EDAnalyzer
+class HcalPedestalWidthsValidation : public edm::EDAnalyzer
 {
    public:
    //Constructor
-   HcalPedestalMCWidths(const edm::ParameterSet& ps);
+   HcalPedestalWidthsValidation(const edm::ParameterSet& ps);
    //Destructor
-   virtual ~HcalPedestalMCWidths();
+   virtual ~HcalPedestalWidthsValidation();
    //Analysis
    void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
 
    private:
    //Container for data, 1 per channel
-   std::vector<MCWidthsBunch> Bunches;
-   //Flag for saving histos
-   std::string pedsADCfilename;
-   std::string widthsfilename;
-
+   std::vector<NewPedBunchVal> BunchVales;
    int runnum;
+   int firstTS;
+   int lastTS;
+   std::string ROOTfilename;
+   std::string pedsADCfilename;
+   std::string pedsfCfilename;
+   std::string widthsADCfilename;
+   std::string widthsfCfilename;
 
-   TProfile *HBMeans[10];
-   TProfile *HEMeans[10];
-   TProfile *HFMeans[10];
-   TProfile *HOMeans[10];
+   TH1F *HBMeans;
+   TH1F *HBWidths;
+   TH1F *HEMeans;
+   TH1F *HEWidths;
+   TH1F *HFMeans;
+   TH1F *HFWidths;
+   TH1F *HOMeans;
+   TH1F *HOWidths;
 
    TFile *theFile;
    bool firsttime;
-   bool histflag;
+   HcalPedestals* rawPedsItem;
+   HcalPedestalWidths* rawWidthsItem;
+   HcalPedestals* rawPedsItemfc;
+   HcalPedestalWidths* rawWidthsItemfc;
 };
 #endif
 
