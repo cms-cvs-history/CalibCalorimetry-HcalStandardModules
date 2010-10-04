@@ -1,5 +1,5 @@
-#ifndef HcalZeroSuppression_H
-#define HcalZeroSuppression_H
+#ifndef HcalPedestalWidthsValidation_H
+#define HcalPedestalWidthsValidation_H
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -32,16 +32,12 @@
 #include "CondTools/Hcal/interface/HcalDbOnline.h"
 
 #include "CalibCalorimetry/HcalAlgos/interface/HcalDbASCIIIO.h"
-//#include "CalibCalorimetry/HcalStandardModules/interface/HcalDbXmlTwo.h"
-#include "CalibCalorimetry/HcalStandardModules/interface/HcalCondXML.h"
 #include "TBDataFormats/HcalTBObjects/interface/HcalTBTriggerData.h"
 
 #include "TFile.h"
 #include "TProfile.h"
 #include "TH1.h"
 #include "TH2.h"
-#include "TStyle.h"
-#include "TCanvas.h"
 #include <math.h>
 #include <iostream>
 #include <map>
@@ -56,37 +52,43 @@ namespace edm {
   class EventSetup;
 }
 
-   struct ZSBunch
+   struct NewPedBunchVal
    {
       HcalDetId detid;
       bool usedflag;
       float cap[4];
+      float capfc[4];
       float sig[4][4];
+      float sigfc[4][4];
       float prod[4][4];
+      float prodfc[4][4];
       int num[4][4];
+      TH1F * hist[4];
+      TH2F * covarhistADC;
+      TH2F * covarhistfC;
    };
 
-class HcalZeroSuppression : public edm::EDAnalyzer
+class HcalPedestalWidthsValidation : public edm::EDAnalyzer
 {
    public:
    //Constructor
-   HcalZeroSuppression(const edm::ParameterSet& ps);
+   HcalPedestalWidthsValidation(const edm::ParameterSet& ps);
    //Destructor
-   virtual ~HcalZeroSuppression();
+   virtual ~HcalPedestalWidthsValidation();
    //Analysis
    void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
 
    private:
    //Container for data, 1 per channel
-   std::vector<ZSBunch> Bunches;
-   //Flag for saving histos
-   bool verboseflag;
+   std::vector<NewPedBunchVal> BunchVales;
    int runnum;
-   int firstTS; //TIMESLICE SELECTION IS HARDCODED
+   int firstTS;
    int lastTS;
    std::string ROOTfilename;
-   std::string ZSfilename;
-   std::string tag;
+   std::string pedsADCfilename;
+   std::string pedsfCfilename;
+   std::string widthsADCfilename;
+   std::string widthsfCfilename;
 
    TH1F *HBMeans;
    TH1F *HBWidths;
@@ -96,11 +98,13 @@ class HcalZeroSuppression : public edm::EDAnalyzer
    TH1F *HFWidths;
    TH1F *HOMeans;
    TH1F *HOWidths;
-   TH1F *ZSHist[4];
-   TH2F *depthhist[4];
 
    TFile *theFile;
    bool firsttime;
+   HcalPedestals* rawPedsItem;
+   HcalPedestalWidths* rawWidthsItem;
+   HcalPedestals* rawPedsItemfc;
+   HcalPedestalWidths* rawWidthsItemfc;
 };
 #endif
 
