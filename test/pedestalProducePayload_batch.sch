@@ -1,8 +1,5 @@
 #!/bin/csh
 
-set currentDir = `pwd`
-echo "current dir is "  $currentDir 
-
 set tag = "HcalPedestals_ADC_v9.12_offline"
 set run = 155555
 set threshold  = 0.2
@@ -14,7 +11,9 @@ cvs co CalibCalorimetry/HcalStandardModules
 scram b
 cd CalibCalorimetry/HcalStandardModules/test
 
-cp <pedFileDir>/pedstxt.zip .
+set localDir = ${1}
+# copy the file from you local directory (need to be specified in ${1} - first parameter for this script)
+cp ${localDir}/pedstxt.zip .
 
     sed -i "s:<send_tag>:${tag}:g" pedestalProducePayload.csh
     sed -i "s:<send_run>:${run}:g" pedestalProducePayload.csh
@@ -22,7 +21,7 @@ cp <pedFileDir>/pedstxt.zip .
 
 ./pedestalProducePayload.csh > logfile_pedestalProducePayload.txt
 
-cp test.db $currentDir
-cp logfile_pedestalProducePayload.txt $currentDir
+cp test.db $localDir
+cp logfile_pedestalProducePayload.txt $localDir
 
 
